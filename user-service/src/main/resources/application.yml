@@ -1,0 +1,24 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: USER-SERVICE
+  data:
+    cassandra:
+      keyspace-name: local_ks
+      port: 9042
+      contact-points: localhost
+      username: cassandra
+      password: cassadra
+      local-datacenter: datacenter1
+      schema-act: create_if_not_exists
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost
