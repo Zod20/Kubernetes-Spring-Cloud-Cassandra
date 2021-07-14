@@ -1,0 +1,48 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: department-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: department-service
+  template:
+    metadata:
+      labels:
+        app: department-service
+    spec:
+      containers:
+        - name: department-service
+          image: localhost:5000/kube-spring-cloud-cass/department-service
+          imagePullPolicy: Always
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: local
+          ports:
+            - containerPort: 9999
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9002
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9002
+            initialDelaySeconds: 5
+      restartPolicy: Always
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: department-service
+spec:
+  type: NodePort
+  ports:
+    - port: 9002
+      targetPort: 9002
+      protocol: TCP
+      nodePort: 30002
+  selector:
+    app: department-service

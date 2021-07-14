@@ -1,0 +1,48 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: cloud-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloud-gateway
+  template:
+    metadata:
+      labels:
+        app: cloud-gateway
+    spec:
+      containers:
+        - name: cloud-gateway
+          image: localhost:5000/kube-spring-cloud-cass/cloud-gateway
+          imagePullPolicy: Always
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: local
+          ports:
+            - containerPort: 9999
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9999
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9999
+            initialDelaySeconds: 5
+      restartPolicy: Always
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: cloud-gateway
+spec:
+  type: NodePort
+  ports:
+    - port: 9999
+      targetPort: 9999
+      protocol: TCP
+      nodePort: 30001
+  selector:
+    app: cloud-gateway
