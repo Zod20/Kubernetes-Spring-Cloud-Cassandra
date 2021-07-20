@@ -1,0 +1,33 @@
+
+spring:
+  application:
+    name: DOMAIN-SERVICE
+  data:
+    cassandra:
+      keyspace-name: local_ks
+      port: 9042
+      contact-points: localhost
+      username: cassandra
+      password: cassadra
+      local-datacenter: datacenter1
+      schema-act: create_if_not_exists
+  cloud:
+    stream:
+      function:
+        definition: domainService
+      bindings:
+        domainService-in-0:
+          destination: active.web-domains
+        kafka:
+          bindings:
+            domainService-in-0:
+              consumer:
+                configuration:
+                  value:
+                    deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+          binders:
+            brokers:
+              - localhost:9091
+              - localhost:9092
+
+
